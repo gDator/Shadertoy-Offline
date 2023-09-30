@@ -18,18 +18,24 @@ void SDFShader::bindAttributes()
 
 void SDFShader::getAllUniformLocations() 
 {
-	m_mouse_pos_id = this->getUniformLocation("iMousePos");
+	m_mouse_pos_id = this->getUniformLocation("iMouse");
 	m_time = this->getUniformLocation("iTime");
     m_resolution_id = this->getUniformLocation("iResolution");
+    m_frame_cnt = this->getUniformLocation("Frame");
 }
 
+void SDFShader::loadFrameCount(int frame)
+{
+    if(m_frame_cnt != -1)
+        loadFloat(m_frame_cnt, (float)frame);
+}
 void SDFShader::loadTime(float time)
 {
     if(m_time != -1)
-    loadFloat(m_time, time);
+        loadFloat(m_time, time);
 }
 
-void SDFShader::loadMousePos(glm::vec2 pos)
+void SDFShader::loadMousePos(glm::vec3 pos)
 {
     if(m_mouse_pos_id != -1)
         loadVector(m_mouse_pos_id, pos);
@@ -46,7 +52,7 @@ SDF::SDF(int width, int height) : m_width(width), m_height(height)
     std::string s; 
     for(auto& line: fragment_shader_input)
         s+= line;
-    p_shader = std::make_shared<SDFShader>(vertex_shader, std::string(fragment_shader_base + s));
+    p_shader = std::make_shared<SDFShader>(vertex_shader, std::string(fragment_shader_base + s + fragment_shader_caller + "\0"));
     p_shader->getAllUniformLocations();
     glCreateVertexArrays(1, &vao_id);
     glGenBuffers(1, &vbo_id);
@@ -71,8 +77,8 @@ void SDF::updateFragmentShader(std::vector<std::string> shader)
     fragment_shader_input = shader;
     std::string s; 
     for(auto& line: fragment_shader_input)
-        s+= line;
-    p_shader = std::make_shared<SDFShader>(vertex_shader, std::string(fragment_shader_base + s));
+        s+= line + "\n";
+    p_shader = std::make_shared<SDFShader>(vertex_shader, std::string(fragment_shader_base + s + fragment_shader_caller + "\0"));
     p_shader->getAllUniformLocations();
 }
 
@@ -84,16 +90,16 @@ void SDF::update(int width, int height)
     m_height = height;
 }
 
-void SDF::begin(float time, Vector2f mouse_pos)
-{
-    static float t = 0;
-    t+= 1./60;
+void SDF::begin(float time, Vector2f mouse_pos, bool mouse_clicked)
+{    
+
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     p_shader->use();
-    p_shader->loadTime(t);
+    p_shader->loadTime(time);
     p_shader->loadResolution(Vector2f(m_width, m_height));
-    p_shader->loadMousePos(mouse_pos);
+    p_shader->loadMousePos(Vector3f(mouse_pos, mouse_clicked?1.f:0.0));
+    p_shader->loadFrameCount(frame);
 }
 
 void SDF::end()

@@ -54,7 +54,12 @@ void MainGui::draw()
         }
         if(ImGui::BeginMenu("Edit"))
         {
-            if(ImGui::MenuItem("Run")) {sdf.updateFragmentShader(text_editor.GetTextLines());}
+            if(ImGui::MenuItem("Run")) 
+            {
+                g_console.throwInfo("New Shader. Compiling...");
+                sdf.updateFragmentShader(text_editor.GetTextLines());
+                
+            }
             ImGui::EndMenu();
         }
         if(ImGui::BeginMenu("View"))
@@ -110,7 +115,7 @@ void MainGui::showViewer()
         g_renderer.startFrameBuffer(cam, m_width, m_height);
         ImGuiIO& io = ImGui::GetIO();
         Vector2f pos = Vector2f(io.MousePos)-Vector2f(win_pos);
-        sdf.begin(glfwGetTime(), pos);
+        sdf.begin(glfwGetTime(), Vector2f(pos.x, m_height-pos.y), io.MouseDown[0]?true:false); //dont know why y is flipped
         sdf.update(m_width, m_height);
         sdf.end();
         //raytracer
@@ -215,15 +220,15 @@ void MainGui::showHelp()
         ImGui::Text("Similiar to Shader Toy;");
         ImGui::Text("Shader has following inputs/outputs");
         ImGui::Bullet();
-        ImGui::Text("iMousePos (vec2) This is the current mouse position inside the view window");
+        ImGui::Text("iMouse (vec2) This is the current mouse position inside the view window");
         ImGui::Bullet();
         ImGui::Text("iResolution (vec2): This is the current viewer window size");
         ImGui::Bullet();    
         ImGui::Text("iTime (float): Passed time since startup");
         ImGui::Bullet();
-        ImGui::Text("coord (vec2): Is the coord of the current fragment");
+        ImGui::Text("fragCoord (vec2): Is the coord of the current fragment");
         ImGui::Bullet();
-        ImGui::Text("color (vec4): Is the color of the current fragment. Needs to be set");
+        ImGui::Text("fragColor (vec4): Is the color of the current fragment. Needs to be set");
         ImGui::Text("Load Files *.glsl, *.vert, *.frag from filesystem with File->Load File");
         ImGui::Text("Write current Shader to file filesystem with File-> Save File");
         ImGui::Text("If any question write me an mail: infos.g.infos@gmail.com");

@@ -20,6 +20,7 @@ unsigned int Shader::createShader(std::string shader, unsigned int type)
     if(!success)
     {
         glGetShaderInfoLog(shader_id, 512, NULL, infoLog);
+         g_console.throwWarning(std::string(shader));
         g_console.throwError(std::string("ERROR::SHADER::VERTEX::COMPILATION::FAILED\n") + std::string(infoLog));
     }
 
@@ -124,6 +125,11 @@ void Shader::bindAttribute(unsigned int attribute, std::string variable_name)
 unsigned int Shader::getUniformLocation(const std::string &uniform_name)
 {
     return glGetUniformLocation(m_shader_id, uniform_name.c_str());
+}
+
+void Shader::loadInt(unsigned int location, int value)
+{
+    glUniform1i(location, value);
 }
 
 void Shader::loadFloat(unsigned int location, float value)

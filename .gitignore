@@ -40,3 +40,4 @@
 ./log
 ./bin
 ./.vscode
+/Makefile

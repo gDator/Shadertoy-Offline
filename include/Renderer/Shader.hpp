@@ -28,9 +28,12 @@ class Shader
         virtual void loadTransformationMatrix(glm::mat4 transformation) {}; //only for draw entity
         virtual void loadTime(float time) {} //only sdf
         virtual void loadResolution(glm::vec2 vec) {} //only sdf
-        virtual void loadMousePos(glm::vec2 pos) {}  //only sdf
+        virtual void loadMousePos(glm::vec3 pos) {}  //only sdf
+        virtual void loadFrameCount(int frame) {}  //only sdf
+        
         void bindAttribute(unsigned int attribute, std::string variable_name);
         unsigned int getUniformLocation(const std::string &uniform_name);
+        void loadInt(unsigned int location, int value);
         void loadFloat(unsigned int location, float value);
         void loadVector(unsigned int loaction, Vector3f vector);
         void loadVector(unsigned int location, Vector2f vector);
